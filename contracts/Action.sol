@@ -9,30 +9,10 @@ contract Staff{
 	function changeActionContract(address _action);
 	function breaktheglass() returns(bool);
 	function hasPermission(bytes32 _permi) returns(bool);
+	function changeRoleState(bytes32 _role); 
 }
 
-/*contract Action{
-	bytes32 name;
-	bytes32 permission;
-	address dataContract;
-	function Action(address _dataContract){
-		dataContract = _dataContract;
-	}
-}
-
-contract AddUser is Action{
-	function addUser(address _ad, address _contract){
-		users[_ad] = _contract;
-	}
-}
-
-contract AddStaff is Action{
-	function addStaff(address _ad, address _contract){
-
-	}
-}
-*/
-contract Control{
+contract Action{
 	mapping(address => address) staffs;
 	mapping(address => address) users;
 	mapping(string => bytes32) actions;
@@ -48,13 +28,17 @@ contract Control{
 	modifier ActionRequirement(bytes32 _permi){
 		if (staffs[msg.sender] == address(0))
 			throw;
-		Staff currentStaff = new Staff(staffs[msg.sender]);
+		Staff currentStaff = Staff(staffs[msg.sender]);
 		if (!currentStaff.hasPermission(_permi))
 			throw;
 		_;
 	}
 
-	function Control() {
+	modifier BreakGlassRequirement(){
+		_;
+	}
+
+	function Action() {
 		root = msg.sender;
 	}
 
@@ -71,12 +55,12 @@ contract Control{
 	}
 
 	function roleAssign(address _ad, bytes32 _role) ActionRequirement(actions["roleAssign"]){
-		Staff currentStaff = new Staff(_ad);
-		contractStaff.changeRoleState(_role);
+		Staff currentStaff = Staff(_ad);
+		currentStaff.changeRoleState(_role);
 	}
 
 	function breakTheGlass(address _ad) ActionRequirement(actions["breakTheGlass"]) BreakGlassRequirement() returns(bool){
-		User currentUser = new User(_ad);
+		User currentUser = User(_ad);
 		return currentUser.breaktheglass();
 	}
 

@@ -20,7 +20,7 @@ contract Admin{
 		_;
 	}
 
-	function admin(address _action){
+	function Admin(address _action){
 		owner = msg.sender;
 		actionContract = _action;
 	}
@@ -31,7 +31,7 @@ contract Admin{
 
 	}
 
-	function hasThePermission(bytes32 _role, bytes32 _permi) return(bool){
+	function hasThePermission(bytes32 _role, bytes32 _permi) returns(bool){
 		if (roles[_role].role == _role && roles[_role].permissions[_permi])
 			return true;
 		else

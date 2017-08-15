@@ -1,7 +1,7 @@
 pragma solidity ^0.4.0;
 
 contract Admin{
-	function hasThePermission();
+	function hasThePermission(bytes32 _role, bytes32 _permi)returns(bool);
 }
 
 contract User{
@@ -16,7 +16,7 @@ contract User{
 		_;
 	}
 
-	function user(address _action, address _admin){
+	function User(address _action, address _admin){
 		owner = msg.sender;
 		actionContract = _action;
 		adminContract = _admin;

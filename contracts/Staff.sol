@@ -1,13 +1,13 @@
 pragma solidity ^0.4.0;
-import "./user.sol";
+import "./User.sol";
 
-contract Staff is user{
+contract Staff is User{
 	mapping(bytes32 => bool) roles;
 	bytes32[] roleList;
 	Admin ad;
 
-	function Staff(){
-		ad = new Admin(adminContract);
+	function Staff(address adminContract){
+		ad = Admin(adminContract);
 	}
 
 	function changeRoleState(bytes32 _role) onlyBy(actionContract){
@@ -18,8 +18,8 @@ contract Staff is user{
 	}
 
 	function hasPermission(bytes32 _permi) returns(bool){
-		for(int i = 0; i < roleList.length; i++){
-			if (Ad.hasThePermission(roleList[j],_permi))
+		for(uint i = 0; i < roleList.length; i++){
+			if (ad.hasThePermission(roleList[i],_permi))
 				return true;
 		}
 		return false;
