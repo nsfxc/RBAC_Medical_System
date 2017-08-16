@@ -26,11 +26,13 @@ contract Action{
 	}
 
 	modifier ActionRequirement(bytes32 _permi){
-		if (staffs[msg.sender] == address(0))
-			throw;
-		Staff currentStaff = Staff(staffs[msg.sender]);
-		if (!currentStaff.hasPermission(_permi))
-			throw;
+		if (!(msg.sender == root)){
+			if (staffs[msg.sender] == address(0))
+				throw;
+			Staff currentStaff = Staff(staffs[msg.sender]);
+			if (!currentStaff.hasPermission(_permi))
+				throw;
+		}
 		_;
 	}
 
@@ -42,7 +44,7 @@ contract Action{
 		root = msg.sender;
 	}
 
-	function assignPermissionRequire(string _ac, bytes32 _permi) {
+	function assignPermissionRequire(string _ac, bytes32 _permi) onlyBy(root){
 		actions[_ac] = _permi;
 	}
 

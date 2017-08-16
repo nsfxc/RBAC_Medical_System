@@ -1,7 +1,7 @@
 pragma solidity ^0.4.0;
 
 contract Admin{
-	function hasThePermission(bytes32 _role, bytes32 _permi)returns(bool);
+	function hasThePermission(bytes32 _role, bytes32 _permi) returns(bool);
 }
 
 contract User{
