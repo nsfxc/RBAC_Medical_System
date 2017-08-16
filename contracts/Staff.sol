@@ -6,7 +6,7 @@ contract Staff is User{
 	bytes32[] roleList;
 	Admin ad;
 
-	function Staff(address adminContract){
+	function Staff(address adminContract, address actionContract) User(actionContract, adminContract){
 		ad = Admin(adminContract);
 	}
 
