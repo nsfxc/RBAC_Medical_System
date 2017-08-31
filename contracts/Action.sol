@@ -1,8 +1,12 @@
 pragma solidity ^0.4.0;
 
-contract User{
-	function changeActionContract(address _action);
-	function breaktheglass() returns(bool);
+import "./Staff.sol";
+
+/*contract User{
+	modifier onlyBy(address _account);
+
+	function breaktheglass() onlyBy(actionContract) returns(bool);
+	function changeActionContract(address _action) onlyBy(actionContract);
 }
 
 contract Staff{
@@ -10,7 +14,7 @@ contract Staff{
 	function breaktheglass() returns(bool);
 	function hasPermission(bytes32 _permi) returns(bool);
 	function changeRoleState(bytes32 _role); 
-}
+}*/
 
 contract Action{
 	mapping(address => address) staffs;
@@ -20,7 +24,7 @@ contract Action{
 	address private root;
 
 	modifier onlyBy(address _ac){
-		if (msg.sender != _ac)
+		if (address(msg.sender) != _ac)
 			throw;
 		_;
 	}
@@ -57,12 +61,19 @@ contract Action{
 	}
 
 	function roleAssign(address _ad, bytes32 _role) ActionRequirement(actions["roleAssign"]){
-		Staff currentStaff = Staff(_ad);
+		Staff currentStaff = Staff(staffs[_ad]);
 		currentStaff.changeRoleState(_role);
 	}
 
+	/*function accessData(address _ad) {
+		Staff currentStaff = Staff(staffs[msg.sender]);
+		User currentUser = User
+		if (currentStaff.hasAccessPermission(_add))
+
+	}*/
+
 	function breakTheGlass(address _ad) ActionRequirement(actions["breakTheGlass"]) BreakGlassRequirement() returns(bool){
-		User currentUser = User(_ad);
+		User currentUser = User(users[_ad]);
 		return currentUser.breaktheglass();
 	}
 
