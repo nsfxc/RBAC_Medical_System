@@ -33,6 +33,7 @@ contract User{
 		owner = msg.sender;
 		actionContract = _action;
 		adminContract = _admin;
+		accessPermissions[owner] = 2;
 	}
 
 	function changeActionContract(address _action) onlyBy(actionContract){
