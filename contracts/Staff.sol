@@ -15,9 +15,12 @@ contract Staff is User{
 
 	struct delegation{
 		uint index;
+		uint toIndex;
 		address from;
+		address fromContract;
 		address to;
-		mapping(string => uint) adminPermi;
+		address toContract;
+		mapping(bytes32 => uint) adminPermi;
 		//mapping(address => uint) accessPermi;
 	}
 
@@ -29,18 +32,19 @@ contract Staff is User{
 		numDelegation = 0;
 	}
 
-	function changeRoleState(bytes32 _role) onlyBy(actionContract) {
+	function changeRoleState(bytes32 _role) onlyBy(actionContract) returns(bool){
 		if (roles[_role])
 			roles[_role] = false;
 		else
 			roles[_role] = true;
+		return roles[_role];
 	}
 
 	/*function changeAccessPermission(uint delegableState) {
 		accessPermissions[msg.sender] = delegableState;
 	}*/
 
-	function PermissionState(string _action) returns(uint){
+	function PermissionState(bytes32 _action) returns(uint){
 		for(uint i = 0; i < roleList.length; i++){
 			if (ad.hasThePermission(roleList[i],_action))
 				return 2;
@@ -66,29 +70,45 @@ contract Staff is User{
 	}*/
 
 
-	function addDelegation(address _from, address _to, string[] _deleadmin, string[] _nondeleadmin) onlyBy(actionContract){
+	function addDelegation(address _from, address _to, address _toContract, uint _toIndex, bytes32[] _deleadmin, bytes32[] _nondeleadmin) onlyBy(actionContract) returns(uint){
 
-		delegations[numDelegation].int = numDelegation;
+		delegations[numDelegation].index = numDelegation;
 		delegations[numDelegation].from = _from;
 		delegations[numDelegation].to = _to;
+		delegations[numDelegation].toIndex = _toIndex;
+		//delegations[numDelegation].fromContract = _fromContract;
+		delegations[numDelegation].toContract = _toContract;
 
-		for(int i = 0; i < _delegable.length; i++)
-			delegations[numDelegation].adminPermi[_deleadmin[i]] = true;
-		/*for(int i = 0; i < _undelegable.length; i++){
-			delegations[numDelegation].accessPermi[_deleaccess[i]] = true;
-			accessPermissions[_deleaccess[i]] = 2;
-		}*/
+		for(uint i = 0; i < _deleadmin.length; i++)
+			delegations[numDelegation].adminPermi[_deleadmin[i]] = 2;
 
-		for(int i = 0; i < _delegable.length; i++)
-			delegations[numDelegation].adminPermi[_nondeleadmin[i]] = true;
-		/*for(int i = 0; i < _undelegable.length; i++){
-			delegations[numDelegation].accessPermi[_nondeleaccess[i]] = true;
-			if (accessPermissions[_deleaccess[i]] != 2)
-				accessPermission[_deleaccess[i]] = 1;
-		}*/
+
+		for(i = 0; i < _nondeleadmin.length; i++)
+			delegations[numDelegation].adminPermi[_nondeleadmin[i]] = 1;
+
 
 		numDelegation++;
+		return (numDelegation - 1);
 	}
 
+	function revokeDelegationPrivate(uint _delegation, bytes32 _permi) internal{
+		delegations[_delegation].adminPermi[_permi] = 0;
+		Staff delegatee = Staff(delegations[_delegation].toContract);
+		delegatee.revokeDelegation(delegations[_delegation].toIndex, _permi);
+	}
+
+	function revokeDelegation(uint _delegation, bytes32 _permi) {
+		if(msg.sender != delegations[_delegation].from && msg.sender != delegations[_delegation].fromContract && msg.sender != actionContract)
+			throw;
+
+		if (delegations[_delegation].adminPermi[_permi] != 0)
+			delegations[_delegation].adminPermi[_permi] = 0;
+		if (PermissionState(_permi) != 2){
+			for(uint i = 0; i < numDelegation; i++)
+				if (delegations[i].from == owner && delegations[i].adminPermi[_permi] != 0)
+					revokeDelegationPrivate(delegations[i].toIndex, _permi);
+
+		}
+	}
 
 }
