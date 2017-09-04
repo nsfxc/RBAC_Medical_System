@@ -35,8 +35,10 @@ contract Staff is User{
 	function changeRoleState(bytes32 _role) onlyBy(actionContract) returns(bool){
 		if (roles[_role])
 			roles[_role] = false;
-		else
+		else{
 			roles[_role] = true;
+			roleList.push(_role);
+		}
 		return roles[_role];
 	}
 
@@ -44,17 +46,23 @@ contract Staff is User{
 		accessPermissions[msg.sender] = delegableState;
 	}*/
 
-	function PermissionState(bytes32 _action) returns(uint){
+	function PermissionState(bytes32 _action) constant returns(uint){
+		uint current = 0;
+		uint temp = 0;
 		for(uint i = 0; i < roleList.length; i++){
-			if (ad.hasThePermission(roleList[i],_action))
-				return 2;
+			temp = ad.hasThePermission(roleList[i],_action);
+			if ( temp > current)
+				current  = temp;
 		}
+		if (temp == 2)
+			return temp;
+
 		for(i = 0; i < numDelegation; i++){
 			if (delegations[i].to == owner)
-				if(delegations[i].adminPermi[_action] != 0)
-					return delegations[i].adminPermi[_action];
+				if(delegations[i].adminPermi[_action] > temp)
+					temp = delegations[i].adminPermi[_action];
 		}
-		return 0;
+		return temp;
 	}
 
 	/*function hasAccessPermission(address _add) returns(bool){

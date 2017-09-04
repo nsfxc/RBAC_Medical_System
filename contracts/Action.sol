@@ -30,7 +30,7 @@ contract Action{
 	}
 
 	modifier ActionRequirement(bytes32 _permi){
-		if (!(msg.sender == root)){
+		if (msg.sender != root){
 			if (staffs[msg.sender] == address(0))
 				throw;
 			Staff currentStaff = Staff(staffs[msg.sender]);
@@ -110,7 +110,7 @@ contract Action{
 		currentUser.changeAccessPermissionStateByDelegation(msg.sender, _delegatee);
 	}
 
-	function breakTheGlass(address _ad, bytes32 hash, uint8 v, bytes32 r, bytes32 s) ActionRequirement("breakTheGlass") Verify(hash, v, r, s) {
+	function breakTheGlass(address _ad/*, bytes32 hash, uint8 v, bytes32 r, bytes32 s*/) ActionRequirement("breakTheGlass") /*Verify(hash, v, r, s) */{
 
 		User currentUser = User(users[_ad]);
 		currentUser.breakTheGlass(msg.sender);

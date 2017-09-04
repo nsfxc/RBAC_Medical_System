@@ -2,9 +2,10 @@ pragma solidity ^0.4.0;
 
 // the staff contract that extends user contract will use 
 // hasThePermission function in the adminContract to check the state of permission
-contract Admin{
-	function hasThePermission(bytes32 _role, bytes32 _permi) returns(bool);
-}
+/*contract Admin{
+	function hasThePermission(bytes32 _role, bytes32 _permi) returns(uint);
+}*/
+import "./Admin.sol";
 
 
 contract User{
@@ -46,8 +47,8 @@ contract User{
 	}
 
 
-	function changeBlackList(address _add) onlyBy(owner) {
-		blacklist[_add]  = (!blacklist[_add]);
+	function changeBlackList(address _add, bool _state) onlyBy(owner) {
+		blacklist[_add]  = _state;
 		//return blacklist[_add];
 	}
 
@@ -59,15 +60,22 @@ contract User{
 	// then he can do a one-step delegation
 	// the action contract will check if the staff member has the delegation permission
 	function changeAccessPermissionStateByDelegation(address _delegator, address _delegatee) onlyBy(actionContract){
-		if (accessPermissions[_delegator] == 2 && (!blacklist[_delegator]))
-			if (delegatedPermission[_delegatee] == address(0))
-				delegatedPermission[_delegatee] = _delegator
+		if (accessPermissions[_delegator] == 2 && (!blacklist[_delegator])){
+			if (delegatedPermission[_delegatee] == address(0x0))
+				delegatedPermission[_delegatee] = _delegator;
+			//else
+			//	throw;
+		}
+		//else
+		//	throw;
 		//nofity();
 	}
 
 	function revokeDelegation(address _delegatee){
 		if (msg.sender == owner || delegatedPermission[_delegatee] == msg.sender)
-			delegatedPermission[_delegatee] = address(0);
+			delegatedPermission[_delegatee] = address(0x0);
+		else
+			throw;
 	}
 
 	// In emergency situation, staff member with the break-the-glass permission can access user's data for one time
@@ -82,10 +90,11 @@ contract User{
 
 	// regular access process
 	function accessData() constant returns(bool){
-		if (accessPermissions[msg.sender] != 0){
-			//connect();
-			return true;
-		}
+		if (!blacklist[msg.sender])
+			if (accessPermissions[msg.sender] != 0 || delegatedPermission[msg.sender] != 0){
+				//connect();
+				return true;
+			}
 		return false;
 	}
 

@@ -11,7 +11,7 @@ contract Admin{
 
 	struct Role{
 		bytes32 role;
-		mapping(bytes32 => bool) permissions;
+		mapping(bytes32 => uint) permissions;
 	}
 
 	modifier onlyBy(address _account){
@@ -25,16 +25,15 @@ contract Admin{
 		actionContract = _action;
 	}
 
-	function changeRolePermission(bytes32 _role, bytes32 _permi) onlyBy(owner){
+	function changeRolePermission(bytes32 _role, bytes32 _permi, uint _state) onlyBy(owner){
 		roles[_role].role  = _role;
-		roles[_role].permissions[_permi] = (!roles[_role].permissions[_permi]);
-
+		roles[_role].permissions[_permi] = _state;
 	}
 
-	function hasThePermission(bytes32 _role, bytes32 _permi) returns(bool){
-		if (roles[_role].role == _role && roles[_role].permissions[_permi])
-			return true;
+	function hasThePermission(bytes32 _role, bytes32 _permi) returns(uint){
+		if (roles[_role].role == _role)
+			return roles[_role].permissions[_permi];
 		else
-			return false;
+			return 0;
 	}
 }
