@@ -19,12 +19,13 @@ contract User{
 	// 1: have undelegable permission;
 	// 2: have delegable permission;
 	mapping(address => uint) accessPermissions;
+	mapping(address => address) delegatedPermission;
 
 	//event connect();
 	//event notify();
 
 	modifier onlyBy(address _account){
-		if (address(msg.sender) == _account)
+		if (address(msg.sender) != _account)
 			throw;
 		_;
 	}
@@ -45,9 +46,9 @@ contract User{
 	}
 
 
-	function changeBlackList(address _add) onlyBy(owner) returns(bool){
+	function changeBlackList(address _add) onlyBy(owner) {
 		blacklist[_add]  = (!blacklist[_add]);
-		return blacklist[_add];
+		//return blacklist[_add];
 	}
 
 	function changeAccessPermissionState(address _ad, uint _state) onlyBy(owner){
@@ -59,9 +60,14 @@ contract User{
 	// the action contract will check if the staff member has the delegation permission
 	function changeAccessPermissionStateByDelegation(address _delegator, address _delegatee) onlyBy(actionContract){
 		if (accessPermissions[_delegator] == 2 && (!blacklist[_delegator]))
-			if (accessPermissions[_delegatee] != 1)
-				accessPermissions[_delegatee] = 1;
+			if (delegatedPermission[_delegatee] == address(0))
+				delegatedPermission[_delegatee] = _delegator
 		//nofity();
+	}
+
+	function revokeDelegation(address _delegatee){
+		if (msg.sender == owner || delegatedPermission[_delegatee] == msg.sender)
+			delegatedPermission[_delegatee] = address(0);
 	}
 
 	// In emergency situation, staff member with the break-the-glass permission can access user's data for one time
@@ -75,7 +81,7 @@ contract User{
 	}
 
 	// regular access process
-	function accessData() returns(bool){
+	function accessData() constant returns(bool){
 		if (accessPermissions[msg.sender] != 0){
 			//connect();
 			return true;
