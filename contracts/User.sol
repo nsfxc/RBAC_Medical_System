@@ -24,6 +24,9 @@ contract User{
 	// 1: have undelegable permission;
 	// 2: have delegable permission;
 	mapping(address => uint) accessPermissions;
+
+	// address(0): not delegated;
+	// other address: the delegator
 	mapping(address => address) delegatedPermission;
 
 	event ChangeNotification(address indexed sender, uint status, bytes32 notificationMsg);
@@ -70,17 +73,12 @@ contract User{
 	// then he can do a one-step delegation
 	// the action contract will check if the staff member has the delegation permission
 	function changeAccessPermissionStateByDelegation(address _delegator, address _delegatee) onlyBy(actionContract){
-		if (accessPermissions[_delegator] == 2 && (!blacklist[_delegator])){
+		if (accessPermissions[_delegator] == 2 && (!blacklist[_delegator]) && accessPermissions[_delegatee] == 0){
 			if (delegatedPermission[_delegatee] == address(0x0)){
 				delegatedPermission[_delegatee] = _delegator;
 				sendEvent(Delegation_event, _delegatee, "Delegation");
 			}
-			//else
-			//	throw;
 		}
-		//else
-		//	throw;
-		//nofity();
 	}
 
 	function revokeDelegation(address _delegatee){
