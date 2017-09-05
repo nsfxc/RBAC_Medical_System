@@ -48,11 +48,11 @@ contract Action{
         // Note: this only verifies that signer is correct.
         // You'll also need to verify that the hash of the data
         // is also correct.
-        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+        //bytes memory prefix = "\x19Ethereum Signed Message:\n32";
 
-    	bytes32 prefixedHash = sha3(prefix, hash);
+    	//bytes32 prefixedHash = sha3(prefix, hash);
 
-        if( !(ecrecover(prefixedHash, v, r, s) == msg.sender))
+        if( !(ecrecover(hash, v, r, s) == msg.sender))
         	throw;
         _;
     }
@@ -110,7 +110,7 @@ contract Action{
 		currentUser.changeAccessPermissionStateByDelegation(msg.sender, _delegatee);
 	}
 
-	function breakTheGlass(address _ad/*, bytes32 hash, uint8 v, bytes32 r, bytes32 s*/) ActionRequirement("breakTheGlass") /*Verify(hash, v, r, s) */{
+	function breakTheGlass(address _ad/*, bytes32 hash, uint8 v, bytes32 r, bytes32 s*/) ActionRequirement("breakTheGlass") /*Verify(hash, v, r, s)*/ {
 
 		User currentUser = User(users[_ad]);
 		currentUser.breakTheGlass(msg.sender);

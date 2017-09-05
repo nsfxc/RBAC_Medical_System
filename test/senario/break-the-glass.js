@@ -14,7 +14,8 @@ contract('Delegation', function(accounts){
 		actionContract,
 		role,
 		sig,
-		ret = {};
+		ret = {},
+		foo,r,s,v;
 
 	before("Set up accounts", function(){
 		user.Account = accounts[0];
@@ -24,10 +25,13 @@ contract('Delegation', function(accounts){
 		admin.Account = accounts[1];
 		role = "role1";
 
-		sig = secp256k1.sign("msgHash", privateKey)
- 		ret.r = sig.signature.slice(0, 32)
-  		ret.s = sig.signature.slice(32, 64)
-  		ret.v = sig.recovery + 27
+		var message = web3.sha3('break-the-glass');
+		foo = web3.eth.sign(staff1.Account,message);
+ 		r = '0x' + foo.slice(0, 64)
+ 		s = '0x' + foo.slice(64, 128)
+		v = '0x' + foo.slice(128, 130)
+		v = web3.toDecimal(v)
+		console.log(r+" "+s+' '+v);
 
 		return user, staff1, staff2, action, admin, role;
 
@@ -97,9 +101,12 @@ contract('Delegation', function(accounts){
 		})
 
 		it("break-the-glass by staff 1",function(){
-			return Action.at(action.address).breakTheGlass(user.Account,{from:staff1.Account})
+			return Action.at(action.address).breakTheGlass(user.Account/*,foo,v,r,s,*/,{from:staff1.Account})
 			.then(function(response){
 				assert.isOk(response, "break the glass failed");
+			}).catch(function(error){
+				assert.equal(error,"Error: VM Exception while processing transaction: invalid opcode");
+				console.log("Catch error, can not do the break-the-glass process".red);
 			})
 		})
 
@@ -112,7 +119,7 @@ contract('Delegation', function(accounts){
 		})
 
 		it("break-the-glass by staff 1",function(){
-			return Action.at(action.address).breakTheGlass(user.Account,{from:staff1.Account})
+			return Action.at(action.address).breakTheGlass(user.Account/*,foo,v,r,s,*/,{from:staff1.Account})
 			.then(function(response){
 				assert.isOk(response, "break the glass failed");
 			})

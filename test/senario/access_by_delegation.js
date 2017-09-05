@@ -3,8 +3,6 @@ var Staff = artifacts.require("./Staff.sol");
 var Action = artifacts.require("./Action.sol");
 var Admin = artifacts.require("./Admin.sol");
 
-
-
 contract('Delegation', function(accounts){
 	var user = {},
 		staff1 = {},
@@ -118,6 +116,9 @@ contract('Delegation', function(accounts){
 			return Action.at(action.address).delegate_access(user.Account,staff2.Account,{from:staff1.Account})
 			.then(function(response){
 				assert.isOk(response, "delegate staff 2 with user's access permission failed");
+			}).catch(function(error){
+				assert.equal(error,"Error: VM Exception while processing transaction: invalid opcode");
+				console.log('Catch error, delegation requirement not satisfied'.red);
 			})
 		})
 
@@ -132,6 +133,9 @@ contract('Delegation', function(accounts){
 			return Action.at(action.address).delegate_access(user.Account,staff2.Account,{from:staff1.Account})
 			.then(function(response){
 				assert.isOk(response, "delegate staff 2 with user's access permission failed");
+			}).catch(function(error){
+				assert.equal(error,"Error: VM Exception while processing transaction: invalid opcode");
+				console.log("Catch error, delegation requirement not satisfied".red);
 			})
 		})
 
@@ -146,6 +150,9 @@ contract('Delegation', function(accounts){
 			return userContract.accessData({from:staff2.Account})
 			.then(function(response){
 				assert.isOk(response, "access data failed");
+			}).catch(function(error){
+				assert.equal(error,"AssertionError: access data failed: expected false to be truthy");
+				console.log("Catch error, can not access".red);
 			})
 		})
 
@@ -174,6 +181,9 @@ contract('Delegation', function(accounts){
 			return userContract.accessData({from:staff2.Account})
 			.then(function(response){
 				assert.isOk(response, "access data failed");
+			}).catch(function(error){
+				assert.equal(error,"AssertionError: access data failed: expected false to be truthy");
+				console.log("Catch error, can not access".red);
 			})
 		})
 

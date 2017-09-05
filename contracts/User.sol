@@ -13,6 +13,10 @@ contract User{
 	address actionContract;
 	address adminContract;
 
+	uint constant Access_event = 1;
+	uint constant Delegation_event = 2;
+	uint constant Break_glass_evnet = 3;
+
 	// accounts on the blacklist cannot access user's data
 	mapping(address => bool) blacklist;
 
@@ -22,6 +26,12 @@ contract User{
 	mapping(address => uint) accessPermissions;
 	mapping(address => address) delegatedPermission;
 
+	event ChangeNotification(address indexed sender, uint status, bytes32 notificationMsg);
+	
+	function sendEvent(uint _status, address _add, bytes32 _notification) internal returns(bool) {
+        ChangeNotification(_add, _status, _notification);
+        return true;
+    }
 	//event connect();
 	//event notify();
 
@@ -61,8 +71,10 @@ contract User{
 	// the action contract will check if the staff member has the delegation permission
 	function changeAccessPermissionStateByDelegation(address _delegator, address _delegatee) onlyBy(actionContract){
 		if (accessPermissions[_delegator] == 2 && (!blacklist[_delegator])){
-			if (delegatedPermission[_delegatee] == address(0x0))
+			if (delegatedPermission[_delegatee] == address(0x0)){
 				delegatedPermission[_delegatee] = _delegator;
+				sendEvent(Delegation_event, _delegatee, "Delegation");
+			}
 			//else
 			//	throw;
 		}
@@ -83,6 +95,8 @@ contract User{
 	function breakTheGlass(address _ad) onlyBy(actionContract) returns(bool){
 		if (blacklist[_ad] )
 			throw;
+
+		sendEvent(Break_glass_evnet, _ad, "breakTheGlass");
 		//notify();
 		//connect();
 		return true;
@@ -93,6 +107,7 @@ contract User{
 		if (!blacklist[msg.sender])
 			if (accessPermissions[msg.sender] != 0 || delegatedPermission[msg.sender] != 0){
 				//connect();
+				sendEvent(Access_event, msg.sender, "Access the data");
 				return true;
 			}
 		return false;

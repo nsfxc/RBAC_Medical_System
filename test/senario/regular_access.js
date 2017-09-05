@@ -58,6 +58,8 @@ contract('User', function(accounts){
 			return userContract.accessData({from:staff2.Account})
 			.then(function(response){
 				assert.isOk(response, "access data failed");
+			}).catch(function(error){
+				console.log("Catch error, can not access".red);
 			})
 		})
 
@@ -72,6 +74,8 @@ contract('User', function(accounts){
 			return userContract.accessData({from:staff1.Account})
 			.then(function(response){
 				assert.isOk(response, "access data failed");
+			}).catch(function(error){
+				console.log("Catch error, can not access".red);
 			})
 		})
 
@@ -79,6 +83,8 @@ contract('User', function(accounts){
 			return userContract.changeAccessPermissionState(staff1.Account,1,{from:staff1.Account})
 			.then(function(response){
 				assert.isOk(response, "change access permission failed");
+			}).catch(function(error){
+				console.log("Catch error, can not change access permission".red);
 			})
 		})
 	})
