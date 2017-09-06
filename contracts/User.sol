@@ -35,8 +35,6 @@ contract User{
         ChangeNotification(_add, _status, _notification);
         return true;
     }
-	//event connect();
-	//event notify();
 
 	modifier onlyBy(address _account){
 		if (address(msg.sender) != _account)
@@ -95,8 +93,6 @@ contract User{
 			throw;
 
 		sendEvent(Break_glass_evnet, _ad, "breakTheGlass");
-		//notify();
-		//connect();
 		return true;
 	}
 
@@ -104,7 +100,6 @@ contract User{
 	function accessData() constant returns(bool){
 		if (!blacklist[msg.sender])
 			if (accessPermissions[msg.sender] != 0 || delegatedPermission[msg.sender] != 0){
-				//connect();
 				sendEvent(Access_event, msg.sender, "Access the data");
 				return true;
 			}

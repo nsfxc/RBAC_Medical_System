@@ -10,8 +10,6 @@ contract Staff is User{
 
 	mapping(uint => delegation) delegations;
 
-// 0: not have the access permission; 1: have non-delegable permission 2: have delegable permission
-	//mapping(address => uint) accessPermissions;
 
 	struct delegation{
 		uint index;
@@ -20,8 +18,8 @@ contract Staff is User{
 		address fromContract;
 		address to;
 		address toContract;
+		// permissions delegated by this delegation
 		mapping(bytes32 => uint) adminPermi;
-		//mapping(address => uint) accessPermi;
 	}
 
 	function Staff(address _actionContract, address _adminContract) User(_actionContract, _adminContract){
