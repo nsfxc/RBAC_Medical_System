@@ -29,10 +29,11 @@ contract User{
 	// other address: the delegator
 	mapping(address => address) delegatedPermission;
 
-	event ChangeNotification(address indexed sender, uint status, bytes32 notificationMsg);
+	event ChangeNotification(address sender, uint status, bytes32 notificationMsg);
 	
-	function sendEvent(uint _status, address _add, bytes32 _notification) internal returns(bool) {
-        ChangeNotification(_add, _status, _notification);
+	// send the notification of activated event
+	function sendEvent(uint _event, address _add, bytes32 _notification) internal returns(bool) {
+        ChangeNotification(_add, _event, _notification);
         return true;
     }
 
@@ -42,10 +43,19 @@ contract User{
 		_;
 	}
 
+	// The _action and _admin are the address of action contract and admin contract
+	// They can be empty address
 	function User(address _action, address _admin){
 		owner = msg.sender;
-		actionContract = _action;
-		adminContract = _admin;
+		if (_action != address(0x0))
+			actionContract = _action;
+		else
+			actionContract = owner;
+
+		if(_admin != address(0x0))
+			adminContract = _admin;
+		else
+			adminContract = owner;
 		accessPermissions[owner] = 2;
 	}
 
@@ -60,7 +70,6 @@ contract User{
 
 	function changeBlackList(address _add, bool _state) onlyBy(owner) {
 		blacklist[_add]  = _state;
-		//return blacklist[_add];
 	}
 
 	function changeAccessPermissionState(address _ad, uint _state) onlyBy(owner){
@@ -79,6 +88,8 @@ contract User{
 		}
 	}
 
+
+	// revoke the delegation by user or the delegator
 	function revokeDelegation(address _delegatee){
 		if (msg.sender == owner || delegatedPermission[_delegatee] == msg.sender)
 			delegatedPermission[_delegatee] = address(0x0);
